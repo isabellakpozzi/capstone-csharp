@@ -13,6 +13,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddDbContext<ReservationServiceContext>(options => options.UseInMemoryDatabase("ReservationServiceDb"));
 
+
+builder.Services.AddScoped<IReservationBusinessService, ReservationBusinessService>();
 builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
 {
     var baseUrl = builder.Configuration["ServiceUrls:UserService"] ?? "http://localhost:5001";
@@ -49,6 +51,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
