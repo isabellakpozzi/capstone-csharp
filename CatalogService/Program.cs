@@ -27,4 +27,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<CatalogServiceContext>();
+    await CatalogDataSeeder.SeedAsync(context);
+}
+
+app.Run();
+
 app.Run();
