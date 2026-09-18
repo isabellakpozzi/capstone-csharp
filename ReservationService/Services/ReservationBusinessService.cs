@@ -207,6 +207,9 @@ public class ReservationBusinessService : IReservationBusinessService
 
     public async Task<PaginatedHistoryResponse> GetHistoryAsync(Guid userId, int page, int size)
     {
+        page = Math.Max(0, page);
+        size = Math.Clamp(size, 1, 100);
+
         var query = _context.Reservations
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.ReturnedAt ?? r.ReservedAt);
