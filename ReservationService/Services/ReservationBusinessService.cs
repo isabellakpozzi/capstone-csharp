@@ -15,17 +15,21 @@ public class ReservationBusinessService : IReservationBusinessService
     private readonly ReservationServiceContext _context;
     private readonly IUserServiceClient _userServiceClient;
     private readonly ICatalogServiceClient _catalogServiceClient;
+
+    private readonly IWaitlistBusinessService _waitlistBusinessService;
     private readonly ILogger<ReservationBusinessService> _logger;
 
     public ReservationBusinessService(
         ReservationServiceContext context,
         IUserServiceClient userServiceClient,
         ICatalogServiceClient catalogServiceClient,
+        IWaitlistBusinessService waitlistBusinessService,
         ILogger<ReservationBusinessService> logger)
     {
         _context = context;
         _userServiceClient = userServiceClient;
         _catalogServiceClient = catalogServiceClient;
+        _waitlistBusinessService = waitlistBusinessService;
         _logger = logger;
     }
 
@@ -180,10 +184,13 @@ public class ReservationBusinessService : IReservationBusinessService
 
         await _context.SaveChangesAsync();
 
-        // TODO (waitlist pass): before this simple increment, check for an eligible
-        // Waiting entry on reservation.BookId. If one exists, auto-create a Reservation
-        // for that patron and mark their entry Notified instead of incrementing here.
-        await _catalogServiceClient.UpdateAvailabilityAsync(reservation.BookId, +1);
+        var handedToWaitlist = await _waitlistBusinessService.TryCascadeToNextEligibleAsync(
+            reservation.BookId, reservation.BookTitle, reservation.BookAuthor);
+
+        if (!handedToWaitlist)
+        {
+            await _catalogServiceClient.UpdateAvailabilityAsync(reservation.BookId, +1);
+        }
 
         return (true, new ReturnResponse
         {

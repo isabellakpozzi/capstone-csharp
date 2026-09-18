@@ -13,7 +13,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddDbContext<ReservationServiceContext>(options => options.UseInMemoryDatabase("ReservationServiceDb"));
 
-
+builder.Services.AddScoped<IWaitlistBusinessService, WaitlistBusinessService>();
 builder.Services.AddScoped<IReservationBusinessService, ReservationBusinessService>();
 builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
 {
