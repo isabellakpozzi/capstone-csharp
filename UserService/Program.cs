@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using UserService.Data;
 using UserService.Services;
+using FluentValidation;
+using UserService.Filters;
+using UserService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +54,13 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // --- Controllers & Swagger ---
-builder.Services.AddControllers();
+// validators
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

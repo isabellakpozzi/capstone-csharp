@@ -4,12 +4,20 @@ using ReservationService.Data;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using ReservationService.Services;
+using FluentValidation;
+using ReservationService.Filters;
+using ReservationService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateReservationRequestValidator>();
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddDbContext<ReservationServiceContext>(options => options.UseInMemoryDatabase("ReservationServiceDb"));
 
