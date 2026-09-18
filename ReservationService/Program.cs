@@ -15,6 +15,8 @@ builder.Services.AddDbContext<ReservationServiceContext>(options => options.UseI
 
 builder.Services.AddScoped<IWaitlistBusinessService, WaitlistBusinessService>();
 builder.Services.AddScoped<IReservationBusinessService, ReservationBusinessService>();
+builder.Services.AddScoped<IWaitlistBusinessService, WaitlistBusinessService>();
+builder.Services.AddHostedService<WaitlistExpiryBackgroundService>();
 builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
 {
     var baseUrl = builder.Configuration["ServiceUrls:UserService"] ?? "http://localhost:5001";
