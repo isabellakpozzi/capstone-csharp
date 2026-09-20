@@ -7,6 +7,7 @@ using ReservationService.Services;
 using FluentValidation;
 using ReservationService.Filters;
 using ReservationService.Validators;
+using ReservationService.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +94,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

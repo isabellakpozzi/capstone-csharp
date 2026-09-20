@@ -7,6 +7,7 @@ using UserService.Services;
 using FluentValidation;
 using UserService.Filters;
 using UserService.Validators;
+using UserService.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // --- Middleware pipeline ---
 if (app.Environment.IsDevelopment())
