@@ -163,3 +163,14 @@ Migrations are applied automatically on startup via `Database.Migrate()`, which 
 - **Graceful degradation** — if ReservationService is unreachable, UserService's profile endpoint still returns successfully with zeroed stats rather than failing the whole request.
 - **Waitlist eligibility is checked at claim time, not join time** — a patron under the limit when they join can still be skipped later if they've since hit it.
 - **`IDesignTimeDbContextFactory`** implementations decouple EF Core migration generation from runtime environment detection, avoiding tooling failures when `Program.cs` branches on `IsDevelopment()`.
+
+## Endpoint Screenshots
+**Hitting the /health endpoint**
+<img width="714" height="169" alt="image" src="https://github.com/user-attachments/assets/d4fefe92-4438-44c4-9160-c0b79bdb3367" />
+
+**Listing the seeded books**
+<img width="830" height="990" alt="image" src="https://github.com/user-attachments/assets/64cba7d1-7797-4211-ba0b-b03eebfc3f18" />
+
+
+
+
