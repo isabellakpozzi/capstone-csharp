@@ -39,3 +39,8 @@ appsettings.Production.json
 TestResults/
 CoverageReport/
 *.trx
+
+## Deployment build artifacts
+publish/
+bundle/
+*.zip
