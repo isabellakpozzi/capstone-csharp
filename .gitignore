@@ -35,3 +35,7 @@ appsettings.Production.json
 
 ## Logs
 *.log
+## Test results / coverage
+TestResults/
+CoverageReport/
+*.trx

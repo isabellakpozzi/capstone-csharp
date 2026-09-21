@@ -9,12 +9,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-builder.Services.AddDbContext<CatalogServiceContext>(options => options.UseInMemoryDatabase("CatalogServiceDb"));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<CatalogServiceContext>(options =>
+        options.UseInMemoryDatabase("CatalogServiceDb"));
+}
+else
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<CatalogServiceContext>(options =>
+        options.UseNpgsql(connectionString));
+}
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<CatalogServiceContext>();
+    context.Database.Migrate();
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
@@ -33,9 +50,15 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<CatalogServiceContext>();
-    await CatalogDataSeeder.SeedAsync(context);
-}
 
-app.Run();
+    if (!app.Environment.IsDevelopment())
+    {
+        context.Database.Migrate();
+    }
+    else
+    {
+        await CatalogDataSeeder.SeedAsync(context);
+    }
+}
 
 app.Run();

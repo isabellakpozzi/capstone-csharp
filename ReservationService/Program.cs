@@ -20,7 +20,17 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilter>();
 });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddDbContext<ReservationServiceContext>(options => options.UseInMemoryDatabase("ReservationServiceDb"));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<ReservationServiceContext>(options =>
+        options.UseInMemoryDatabase("ReservationServiceDb"));
+}
+else
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<ReservationServiceContext>(options =>
+        options.UseNpgsql(connectionString));
+}
 
 builder.Services.AddScoped<IWaitlistBusinessService, WaitlistBusinessService>();
 builder.Services.AddScoped<IReservationBusinessService, ReservationBusinessService>();
@@ -94,6 +104,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ReservationServiceContext>();
+    context.Database.Migrate();
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

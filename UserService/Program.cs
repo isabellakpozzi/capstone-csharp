@@ -12,7 +12,17 @@ using UserService.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Database ---
-builder.Services.AddDbContext<UserServiceContext>(options => options.UseInMemoryDatabase("UserServiceDb"));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<UserServiceContext>(options =>
+        options.UseInMemoryDatabase("UserServiceDb"));
+}
+else
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<UserServiceContext>(options =>
+        options.UseNpgsql(connectionString));
+}
 
 // --- Business logic services ---
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -91,6 +101,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<UserServiceContext>();
+    context.Database.Migrate();
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
